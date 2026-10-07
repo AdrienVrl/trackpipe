@@ -1,0 +1,112 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 25, "patch": 0 },
+
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug",
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "debug-asan",
+      "displayName": "Debug + AddressSanitizer + UBSan",
+      "inherits": "debug",
+      "cacheVariables": { "TRACKPIPE_SANITIZER": "address;undefined" }
+    },
+    {
+      "name": "debug-tsan",
+      "displayName": "Debug + ThreadSanitizer",
+      "inherits": "debug",
+      "cacheVariables": { "TRACKPIPE_SANITIZER": "thread" }
+    },
+    {
+      "name": "release",
+      "displayName": "Release (optimized, with debug info for profiling)",
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+    {
+      "name": "ci-asan",
+      "displayName": "CI: ASan + UBSan + clang-tidy, warnings as errors",
+      "inherits": "debug-asan",
+      "cacheVariables": {
+        "TRACKPIPE_WARNINGS_AS_ERRORS": "ON",
+        "TRACKPIPE_ENABLE_CLANG_TIDY": "ON"
+      }
+    },
+    {
+      "name": "ci-tsan",
+      "displayName": "CI: TSan, warnings as errors",
+      "inherits": "debug-tsan",
+      "cacheVariables": { "TRACKPIPE_WARNINGS_AS_ERRORS": "ON" }
+    }
+  ],
+
+  "buildPresets": [
+    { "name": "debug",      "configurePreset": "debug" },
+    { "name": "debug-asan", "configurePreset": "debug-asan" },
+    { "name": "debug-tsan", "configurePreset": "debug-tsan" },
+    { "name": "release",    "configurePreset": "release" },
+    { "name": "ci-asan",    "configurePreset": "ci-asan" },
+    { "name": "ci-tsan",    "configurePreset": "ci-tsan" }
+  ],
+
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error", "stopOnFailure": false },
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:strict_string_checks=1:detect_stack_use_after_return=1",
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1",
+        "TSAN_OPTIONS": "halt_on_error=1:second_deadlock_stack=1"
+      }
+    },
+    { "name": "debug",      "inherits": "base", "configurePreset": "debug" },
+    { "name": "debug-asan", "inherits": "base", "configurePreset": "debug-asan" },
+    { "name": "debug-tsan", "inherits": "base", "configurePreset": "debug-tsan" },
+    { "name": "release",    "inherits": "base", "configurePreset": "release" },
+    { "name": "ci-asan",    "inherits": "base", "configurePreset": "ci-asan" },
+    { "name": "ci-tsan",    "inherits": "base", "configurePreset": "ci-tsan" }
+  ],
+
+  "workflowPresets": [
+    {
+      "name": "dev",
+      "displayName": "Configure, build and test (debug)",
+      "steps": [
+        { "type": "configure", "name": "debug" },
+        { "type": "build",     "name": "debug" },
+        { "type": "test",      "name": "debug" }
+      ]
+    },
+    {
+      "name": "ci-asan",
+      "steps": [
+        { "type": "configure", "name": "ci-asan" },
+        { "type": "build",     "name": "ci-asan" },
+        { "type": "test",      "name": "ci-asan" }
+      ]
+    },
+    {
+      "name": "ci-tsan",
+      "steps": [
+        { "type": "configure", "name": "ci-tsan" },
+        { "type": "build",     "name": "ci-tsan" },
+        { "type": "test",      "name": "ci-tsan" }
+      ]
+    }
+  ]
+}

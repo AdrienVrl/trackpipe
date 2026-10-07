@@ -1,0 +1,24 @@
+# Build output
+build/
+.cache/
+compile_commands.json
+
+# Generated inference artifacts (machine-specific, regenerated on demand)
+*.engine
+*.plan
+*.timing.cache
+# Uncomment to keep INT8 calibration caches out too
+# *.calib
+
+# Large inputs: keep models and clips out of git history
+models/
+*.onnx
+data/
+*.mp4
+*.mkv
+*.avi
+
+# Local tool settings
+.claude/settings.local.json
+CLAUDE.local.md
+.vscode/

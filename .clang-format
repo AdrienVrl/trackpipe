@@ -1,0 +1,7 @@
+# Google style with a wider line; adjust once and never argue about it again.
+BasedOnStyle: Google
+ColumnLimit: 100
+IndentWidth: 2
+DerivePointerAlignment: false
+PointerAlignment: Left
+IncludeBlocks: Regroup

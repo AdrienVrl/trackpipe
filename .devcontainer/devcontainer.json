@@ -1,0 +1,64 @@
+// trackpipe dev container (JSONC: comments allowed)
+{
+  "name": "trackpipe-dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".",
+    "target": "dev-gpu",
+    "args": { "TRT_TAG": "26.02-py3" }
+  },
+
+  "runArgs": [
+    "--gpus=all",
+    // Real-time scheduling experiments (SCHED_FIFO) in Phases 2 and 5
+    "--cap-add=SYS_NICE",
+    "--ulimit=rtprio=99",
+    // Shares WSL's network: UDP streams from Windows reach localhost
+    // (with WSL mirrored networking enabled in .wslconfig)
+    "--network=host",
+    // Bigger shared memory for OpenCV / CUDA IPC than Docker's 64 MB default
+    "--shm-size=1g"
+    // Devices: --device fails if the node is missing at container start.
+    // Attach with usbipd first, then uncomment and "Rebuild Container".
+    // ,"--device=/dev/ttyACM0"
+    // ,"--device=/dev/video0"
+  ],
+
+  // WSLg: lets OpenCV windows (cv::imshow) open on the Windows desktop
+  "mounts": [
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+    "source=/mnt/wslg,target=/mnt/wslg,type=bind",
+    // Claude Code login and settings survive container rebuilds
+    "source=trackpipe-claude-config,target=/home/dev/.claude,type=volume",
+    // Compiler cache survives rebuilds too
+    "source=trackpipe-ccache,target=/home/dev/.cache/ccache,type=volume"
+  ],
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}",
+    "WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
+    "XDG_RUNTIME_DIR": "/mnt/wslg/runtime-dir",
+    "PULSE_SERVER": "/mnt/wslg/PulseServer"
+  },
+
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+
+  "remoteUser": "dev",
+  // Named volumes are created root-owned; hand them to the dev user
+  "postCreateCommand": "sudo chown -R dev:dev /home/dev/.claude /home/dev/.cache && verify-env",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.cmake-tools",
+        "anthropic.claude-code"
+      ],
+      "settings": {
+        "cmake.useCMakePresets": "always",
+        "clangd.path": "/usr/local/bin/clangd"
+      }
+    }
+  }
+}

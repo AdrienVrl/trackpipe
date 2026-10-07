@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: ${{ matrix.preset }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [ci-asan, ci-tsan]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Same image as local development, minus CUDA (CI runners have no GPU)
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ci-cpu image
+        uses: docker/build-push-action@v6
+        with:
+          context: .devcontainer
+          file: .devcontainer/Dockerfile
+          target: ci-cpu
+          tags: trackpipe-ci:latest
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Newer kernels use more mmap randomness than older sanitizer runtimes
+      # expect, which can make ASan/TSan abort at startup.
+      - name: Make sanitizers happy with the runner kernel
+        run: sudo sysctl -w vm.mmap_rnd_bits=28
+
+      - name: Check formatting
+        if: matrix.preset == 'ci-asan'
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src --user "$(id -u):$(id -g)" trackpipe-ci:latest \
+            bash -c "git ls-files '*.cpp' '*.hpp' '*.h' '*.cu' | xargs -r clang-format --dry-run --Werror"
+
+      - name: Configure, build and test
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src --user "$(id -u):$(id -g)" \
+            -e CCACHE_DISABLE=1 -e HOME=/tmp \
+            trackpipe-ci:latest \
+            cmake --workflow --preset ${{ matrix.preset }}
