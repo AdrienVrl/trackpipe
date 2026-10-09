@@ -1,7 +1,7 @@
 # trackpipe_core: everything except main(). Phases add sources here
 # (or in subdirectories: sources/, queue/, inference/, tracking/, protocol/).
 add_library(trackpipe_core
-  core/version.cpp)
+  core/version.cpp core/frame.cpp)
 add_library(trackpipe::core ALIAS trackpipe_core)
 
 target_include_directories(trackpipe_core

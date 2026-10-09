@@ -20,8 +20,8 @@
     "--shm-size=1g"
     // Devices: --device fails if the node is missing at container start.
     // Attach with usbipd first, then uncomment and "Rebuild Container".
-    // ,"--device=/dev/ttyACM0"
-    // ,"--device=/dev/video0"
+    ,"--device=/dev/ttyACM0"
+    ,"--device=/dev/video0"
   ],
 
   // WSLg: lets OpenCV windows (cv::imshow) open on the Windows desktop

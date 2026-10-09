@@ -2,7 +2,7 @@ find_package(GTest REQUIRED)
 include(GoogleTest)
 
 add_executable(trackpipe_tests
-  test_version.cpp)
+  test_version.cpp test_frame.cpp)
 
 target_link_libraries(trackpipe_tests
   PRIVATE trackpipe::core trackpipe::project_warnings GTest::gtest_main)

@@ -56,20 +56,20 @@ The dashed arrow closes the loop physically: moving the servos moves the camera,
   - `dev-gpu`: based on an NVIDIA NGC TensorRT image, plus GCC 13+ or Clang 18+, CMake 3.25+, Ninja, clang-format, clang-tidy, GDB, OpenCV and GoogleTest. Check that the image's TensorRT supports the T1000 and that your Windows driver is new enough for its CUDA version.
   - `ci-cpu`: slim Ubuntu with the CPU-only dependencies, used by CI and later as the base for the ARM64 cross-build.
 - [X] Install `usbipd-win` on Windows; bind and attach the Nucleo (`usbipd list`, `usbipd bind`, `usbipd attach --wsl`) and confirm `/dev/ttyACM0` in WSL. Script the attach step, since it does not survive unplugging or rebooting.
-- [ ] Try attaching the webcam the same way and check for `/dev/video0`. Timebox this to one afternoon; if it fails, the network source in Phase 1 covers it.
-- [ ] Enable WSL mirrored networking in `.wslconfig`, so Windows tools can stream to `localhost`.
-- [ ] Write `devcontainer.json` for VS Code Dev Containers with these run arguments, documented in the README:
+- [X] Try attaching the webcam the same way and check for `/dev/video0`. Timebox this to one afternoon; if it fails, the network source in Phase 1 covers it.
+- [X] Enable WSL mirrored networking in `.wslconfig`, so Windows tools can stream to `localhost`.
+- [X] Write `devcontainer.json` for VS Code Dev Containers with these run arguments, documented in the README:
   - GPU: `--gpus all`
   - Devices: `--device /dev/ttyACM0` (plus `/dev/video0` if attached); attach devices before starting the container
   - Display: mount `/tmp/.X11-unix` and `/mnt/wslg`, pass `DISPLAY`, `WAYLAND_DISPLAY` and `XDG_RUNTIME_DIR`
   - Real-time: `--cap-add=SYS_NICE --ulimit rtprio=99`
   - Network: `--network host`, or publish the UDP port (`-p 5000:5000/udp`)
-- [ ] Inside the container, run `deviceQuery` and `trtexec` on a small ONNX model to confirm the GPU stack end to end.
-- [ ] Add `CMakePresets.json`: `debug`, `debug-asan` (ASan + UBSan), `debug-tsan`, `release`.
-- [ ] GitHub Actions workflow that builds the `ci-cpu` image, builds the project and runs tests.
-- [ ] Flash the STM32 outside the container: STM32CubeProgrammer on Windows, or `st-flash`/OpenOCD in WSL.
-- [ ] Order hardware now so it arrives by Phase 4: two micro servos with a pan-tilt bracket, a separate 5 V supply, jumper wires, and ideally a small USB webcam to mount on the bracket.
-- [ ] Record two or three test clips (a person or object moving at different speeds) with the Windows camera app.
+- [X] Inside the container, run `deviceQuery` and `trtexec` on a small ONNX model to confirm the GPU stack end to end.
+- [X] Add `CMakePresets.json`: `debug`, `debug-asan` (ASan + UBSan), `debug-tsan`, `release`.
+- [X] GitHub Actions workflow that builds the `ci-cpu` image, builds the project and runs tests.
+- [X] Flash the STM32 outside the container: STM32CubeProgrammer on Windows, or `st-flash`/OpenOCD in WSL.
+- [X] Order hardware now so it arrives by Phase 4: two micro servos with a pan-tilt bracket, a separate 5 V supply, jumper wires, and ideally a small USB webcam to mount on the bracket.
+- [X] Record two or three test clips (a person or object moving at different speeds) with the Windows camera app.
 
 **Acceptance criteria**
 
