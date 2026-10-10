@@ -89,7 +89,7 @@ The dashed arrow closes the loop physically: moving the servos moves the camera,
 
 **Backlog**
 
-- [ ] Define `Frame`: width, height, stride, pixel format, sequence number, capture timestamp (`std::chrono::steady_clock`), and an owned pixel buffer. Make it move-only.
+- [X] Define `Frame`: width, height, stride, pixel format, sequence number, capture timestamp (`std::chrono::steady_clock`), and an owned pixel buffer. Make it move-only.
 - [ ] Define the `FrameSource` interface: `open()`, `next() -> std::expected<Frame, Error>`, `close()`.
 - [ ] `FileSource`: decode a video file (OpenCV or FFmpeg's libav). Add a `--realtime` option that paces frames at the file's FPS, so benchmarks behave like a camera.
 - [ ] `NetworkSource`: receive an MPEG-TS stream over UDP. On Windows, stream the webcam with `ffmpeg -f dshow -i video="<camera name>" -f mpegts udp://localhost:5000`.

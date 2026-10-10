@@ -53,7 +53,8 @@ static_assert(trackpipe::bytes_per_pixel(PixelFormat::YUYV) == 2);
 
 TEST(FrameTest, createStoresMetadata) {
   const auto timestamp = std::chrono::steady_clock::now();
-  auto result = Frame::create(default_width, default_height, default_stride, PixelFormat::RGB8, timestamp, 42);
+  auto result = Frame::create(default_width, default_height, default_stride, PixelFormat::RGB8,
+                              timestamp, 42);
   ASSERT_TRUE(result.has_value());
 
   const Frame& frame = *result;
@@ -68,7 +69,8 @@ TEST(FrameTest, createStoresMetadata) {
 TEST(FrameTest, createAllocatesStrideTimesHeight) {
   const Frame frame = make_frame();
   EXPECT_FALSE(frame.empty());
-  EXPECT_EQ(frame.data().size(), static_cast<std::size_t>(default_stride) * static_cast<std::size_t>(default_height));
+  EXPECT_EQ(frame.data().size(),
+            static_cast<std::size_t>(default_stride) * static_cast<std::size_t>(default_height));
 }
 
 TEST(FrameTest, createAcceptsStrideEqualToRowSize) {
@@ -83,7 +85,8 @@ TEST(FrameTest, createAcceptsPaddedStride) {
   auto result = Frame::create(default_width, default_height, default_width + 64, PixelFormat::GRAY8,
                               std::chrono::steady_clock::now(), 1);
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->data().size(), static_cast<std::size_t>(default_width + 64) * static_cast<std::size_t>(default_height));
+  EXPECT_EQ(result->data().size(), static_cast<std::size_t>(default_width + 64) *
+                                       static_cast<std::size_t>(default_height));
 }
 
 // --- create(): invalid input returns an error, never throws -----------------
@@ -105,7 +108,7 @@ TEST(FrameTest, createRejectsNonPositiveHeight) {
 
 TEST(FrameTest, createRejectsNonPositiveStride) {
   expect_invalid_argument(default_width, default_height, 0, PixelFormat::RGB8);
-  expect_invalid_argument(default_width, default_height, -default_stride    , PixelFormat::RGB8);
+  expect_invalid_argument(default_width, default_height, -default_stride, PixelFormat::RGB8);
 }
 
 TEST(FrameTest, createDoesNotThrow) {
